@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MycoCraft - Our Services & Supplies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === RESET & CORE === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* === THEME VARIABLES === */
+        :root {
+            --bg-color: #F8FAFC;
+            --bg-secondary: #F1F5F9; 
+            --bg-card: #FFFFFF; 
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --accent-color: #16A34A;
+            --accent-dark: #15803D;  
+            --border-color: #E2E8F0;
+            --drawer-bg: rgba(255, 255, 255, 0.98);
+            --drawer-text: #0F172A;
+        }
+
+        /* DARK MODE */
+        body.dark-mode {
+            --bg-color: #0B1120; 
+            --bg-secondary: #1E293B; 
+            --bg-card: #1E293B; 
+            --text-main: #F8FAFC; 
+            --text-muted: #94A3B8;
+            --accent-color: #4ADE80; 
+            --accent-dark: #22C55E; 
+            --border-color: #334155;
+            --drawer-bg: rgba(11, 17, 32, 0.98);
+            --drawer-text: #F8FAFC;
+        }
+
+        /* RTL SUPPORT */
+        [dir="rtl"] { text-align: right; }
+        [dir="rtl"] .ml-auto { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .mr-auto { margin-left: auto; margin-right: 0; }
+
+        @keyframes subtleZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+        .animate-zoom { animation: subtleZoom 20s infinite alternate ease-in-out; }
+
+        /* === NAVBAR DESIGN (FLOATING BOX WITH UNDERLINE ANIMATION) === */
+        .navbar { 
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 95%; 
+            max-width: 1440px; 
+            z-index: 1000;
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.1); 
+            padding: 12px 24px; 
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link { 
+            padding: 8px 4px; margin: 0 12px; 
+            color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; transition: color 0.3s ease; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; 
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link:hover, .nav-link.active { 
+            color: var(--accent-color); 
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Dropdown */
+        .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
+        .dropdown-menu { position: absolute; top: 100%; left: 0; transform: translateY(15px); margin-top: 10px; opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 100; }
+        .dropdown-inner { 
+            background: var(--bg-card); border: 1px solid var(--border-color); border-top: 3px solid var(--accent-color); 
+            border-radius: 0 0 8px 8px; min-width: 220px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 8px; display: flex; flex-direction: column; gap: 4px; 
+        }
+        .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        .dropdown-item { display: block; padding: 12px 16px; border-radius: 6px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s; text-align: left; white-space: nowrap; }
+        .dropdown-item:hover { background: var(--bg-secondary); color: var(--accent-color); padding-left: 20px; }
+        [dir="rtl"] .dropdown-item:hover { padding-left: 16px; padding-right: 20px; }
+
+        /* PILL TOGGLE */
+        .theme-toggle-pill { width: 52px; height: 26px; background: var(--bg-secondary); border-radius: 30px; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; border: 1px solid var(--border-color); }
+        .theme-toggle-pill i { font-size: 10px; z-index: 1; }
+        .theme-toggle-pill .fa-sun { color: #f59e0b; }
+        .theme-toggle-pill .fa-moon { color: #999; }
+        .theme-toggle-pill .thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 2; }
+        body.dark-mode .theme-toggle-pill .thumb { transform: translateX(26px); background: #333; }
+
+        /* RTL BUTTON STYLE */
+        .rtl-btn-style {
+            width: 44px; height: 26px; background: var(--bg-secondary); border-radius: 30px; border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; cursor: pointer;
+            color: var(--text-main); transition: all 0.3s ease;
+        }
+        .rtl-btn-style:hover { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+
+        /* === BUTTON DESIGN === */
+        .btn { 
+            padding: 12px 28px; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; 
+            border-radius: 50px; position: relative;
+        }
+        .btn-solid { background: var(--accent-color); color: #FFFFFF !important; border: 2px solid var(--accent-color); box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.2); }
+        .btn-solid:hover { background: var(--accent-dark); border-color: var(--accent-dark); transform: scale(1.03); box-shadow: 0 8px 24px -4px rgba(22, 163, 74, 0.5); }
+        .btn-outline { border: 2px solid var(--accent-color); color: var(--accent-color); background: transparent; }
+        .btn-outline:hover { background: var(--accent-color); color: #FFFFFF !important; transform: scale(1.03); box-shadow: 0 8px 24px -4px rgba(22, 163, 74, 0.4); }
+
+        /* MOBILE OVERLAY & HAMBURGER */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); }
+        .drawer-overlay.active { opacity: 1; visibility: visible; }
+
+        .fullscreen-menu { 
+            position: fixed; inset: 0; width: 100%; height: 100dvh; max-width: 100%; background: var(--drawer-bg); z-index: 1001; display: flex; flex-direction: column; 
+            opacity: 0; visibility: hidden; transform: scale(0.95); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); backdrop-filter: blur(20px);
+        }
+        .fullscreen-menu.active { opacity: 1; visibility: visible; transform: scale(1); }
+        .mobile-link { display: inline-block; width: auto; padding: 10px 0; font-size: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; color: var(--text-main); text-decoration: none; transition: all 0.3s; text-align: center; }
+        .mobile-link:hover { color: var(--accent-color); transform: scale(1.05); }
+
+        /* FOOTER */
+        footer { background: var(--bg-secondary); border-top: 1px solid var(--border-color); padding-top: 60px; }
+        footer h4 { color: var(--text-main); font-weight: 700; font-size: 1.1rem; margin-bottom: 20px; } 
+        footer a, footer li, footer span { color: var(--text-muted); text-decoration: none; transition: all 0.3s; font-size: 0.95rem; }
+        footer a:hover { color: var(--accent-color); }
+        .social-link-circle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: var(--text-main); background: var(--bg-card); }
+        .social-link-circle:hover { background: var(--accent-color); color: #FFFFFF; border-color: var(--accent-color); transform: translateY(-3px); }
+        .footer-bottom { border-top: 1px solid var(--border-color); padding: 24px 0; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar flex items-center justify-between">
+        <div class="flex items-center">
+            <a href="index.html" class="text-xl font-black tracking-tighter block flex items-center gap-2" style="color: var(--text-main); text-decoration: none;">
+                MycoCraft
+            </a>
+        </div>
+        <div class="hidden xl:flex justify-center items-center flex-1 px-4">
+            <div class="dropdown">
+                <div class="nav-link">Home <i class="fas fa-chevron-down text-[10px] ml-1 opacity-70"></i></div>
+                <div class="dropdown-menu">
+                    <div class="dropdown-inner">
+                        <a href="index.html" class="dropdown-item">Home Page 1</a>
+                        <a href="home-2.html" class="dropdown-item">Home Page 2</a>
+                    </div>
+                </div>
+            </div>
+            <a href="about.html" class="nav-link">About</a>
+            <a href="services.html" class="nav-link active">Services</a>
+            <a href="pricing.html" class="nav-link">Pricing</a>
+            <a href="blog.html" class="nav-link">Blog</a>
+            <a href="faq.html" class="nav-link">FAQ</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+            <div class="dropdown">
+                <div class="nav-link">Dashboard <i class="fas fa-chevron-down text-[10px] ml-1 opacity-70"></i></div>
+                <div class="dropdown-menu">
+                    <div class="dropdown-inner">
+                        <a href="user.html" class="dropdown-item">User Dashboard</a>
+                        <a href="admin.html" class="dropdown-item">Admin Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden xl:flex items-center justify-end gap-3">
+            <div id="theme-toggle-desktop" class="theme-toggle-pill mr-2" title="Toggle Dark Mode">
+                <i class="fas fa-sun"></i><i class="fas fa-moon"></i><div class="thumb"></div>
+            </div>
+            <button id="rtl-btn" class="rtl-btn-style mr-2" title="Toggle LTR/RTL">LTR</button>
+            <a href="login.html" class="btn btn-outline !py-2 !px-4 !text-[11px]">Login</a> 
+            <a href="register.html" class="btn btn-solid !py-2 !px-4 !text-[11px]">Register</a>
+        </div>
+        <div class="xl:hidden flex items-center justify-end">
+            <button id="mobile-btn" class="w-10 h-10 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-main)] hover:text-[var(--accent-color)] hover:border-[var(--accent-color)] transition-all">
+                <i class="fas fa-bars text-lg"></i>
+            </button>
+        </div>
+    </nav>
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+
+    <div class="fullscreen-menu" id="fullscreen-menu">
+        <div class="w-full px-8 py-6 flex justify-between items-center shrink-0">
+            <a href="index.html" class="text-2xl font-black tracking-tighter block flex items-center gap-2" style="color: var(--text-main); text-decoration: none;">
+                MycoCraft
+            </a>
+            <button id="close-menu" class="w-10 h-10 rounded-full border border-[var(--border-color)] flex items-center justify-center hover:border-[var(--accent-color)] hover:text-[var(--accent-color)] transition-all text-xl bg-[var(--bg-secondary)] text-[var(--text-main)]">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex flex-col items-center justify-start w-full overflow-y-auto flex-1 gap-2 pt-6 pb-8">
+            <a href="index.html" class="mobile-link">Home Page 1</a>
+            <a href="home-2.html" class="mobile-link">Home Page 2</a>
+            <a href="about.html" class="mobile-link">About</a>
+            <a href="services.html" class="mobile-link" style="color: var(--accent-color);">Services</a>
+            <a href="pricing.html" class="mobile-link">Pricing</a>
+            <a href="blog.html" class="mobile-link">Blog</a>
+            <a href="faq.html" class="mobile-link">FAQ</a>
+            <a href="contact.html" class="mobile-link">Contact</a>
+            <div class="w-16 h-px bg-[var(--border-color)] my-4"></div>
+            <span class="text-[10px] font-bold text-[var(--accent-color)] uppercase tracking-widest mb-1">Portals</span>
+            <a href="user.html" class="mobile-link !text-lg !font-semibold text-[var(--text-muted)]">User Dashboard</a>
+            <a href="admin.html" class="mobile-link !text-lg !font-semibold text-[var(--text-muted)]">Admin Dashboard</a>
+        </div>
+        <div class="w-full px-8 py-8 border-t border-[var(--border-color)] flex flex-col gap-6 shrink-0 bg-[var(--bg-secondary)]">
+            <div class="flex justify-between items-center w-full max-w-sm mx-auto">
+                <div class="flex items-center gap-3">
+                    <span class="text-[var(--text-muted)] font-bold text-[10px] uppercase tracking-widest">Theme</span>
+                    <div id="theme-toggle-mobile" class="theme-toggle-pill"><i class="fas fa-sun"></i><i class="fas fa-moon"></i><div class="thumb"></div></div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-[var(--text-muted)] font-bold text-[10px] uppercase tracking-widest">Dir</span>
+                    <button id="rtl-toggle-mobile" class="rtl-btn-style">LTR</button>
+                </div>
+            </div>
+            <div class="flex gap-4 w-full max-w-sm mx-auto">
+                <a href="login.html" class="btn btn-outline flex-1 !py-3">Login</a>
+                <a href="register.html" class="btn btn-solid flex-1 !py-3">Register</a>
+            </div>
+        </div>
+    </div>
+
+    <section class="relative w-full min-h-[100dvh] lg:h-[100dvh] pt-32 lg:pt-28 pb-12 lg:pb-8 flex items-center bg-[var(--bg-color)] overflow-hidden">
+        <div class="absolute top-1/4 right-0 w-[40%] h-[70%] bg-[var(--accent-color)] opacity-[0.03] rounded-l-full blur-3xl z-0 pointer-events-none hidden lg:block"></div>
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10 mt-6 lg:mt-0">
+            <div class="flex flex-col items-start text-left justify-center lg:h-full">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/20 text-[var(--accent-color)] text-[10px] font-bold uppercase tracking-widest mb-4">
+                    <i class="fas fa-box-open"></i> Premium Cultivation Supplies
+                </div>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] mb-4 text-[var(--text-main)] tracking-tight">
+                    Professional <br class="hidden lg:block">
+                    <span style="color: var(--accent-color);">Grow Supplies</span>.
+                </h1>
+                <p class="text-[var(--text-muted)] text-sm sm:text-base md:text-lg leading-relaxed max-w-lg font-medium mb-6 lg:mb-8">
+                    From beginner-friendly All-In-One bags to laboratory-grade agar plates and isolated liquid cultures, explore our full catalog of sterile mycology equipment.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+                    <a href="#products" class="btn btn-solid group !py-3 sm:!py-4 !px-6 sm:!px-8 text-xs sm:text-sm flex justify-center items-center gap-3">
+                        <span>Browse Catalog</span>
+                        <i class="fas fa-arrow-down transition-transform group-hover:translate-y-1"></i>
+                    </a>
+                    <a href="contact.html" class="btn btn-outline w-full sm:w-auto !py-3 sm:!py-4 !px-6 sm:!px-8 text-xs sm:text-sm transition-all flex justify-center items-center gap-2">
+                        <i class="fas fa-handshake text-[var(--accent-color)]"></i> Wholesale Inquiry
+                    </a>
+                </div>
+            </div>
+            <div class="relative w-full h-[40vh] sm:h-[50vh] lg:h-[70vh] flex items-center justify-center mt-6 lg:mt-0">
+                <div class="relative w-full h-full max-h-[600px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden shadow-2xl border-4 border-[var(--bg-card)]">
+                    <img src="images/pexels-enginakyurt-10899526.jpg" alt="Cultivation Supplies" class="w-full h-full object-cover animate-zoom" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-[var(--text-main)]/60 to-transparent"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="products" class="py-24 bg-[var(--bg-secondary)] border-y border-[var(--border-color)] relative">
+        <div class="max-w-[1440px] mx-auto px-6 lg:px-12">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent-color)] block mb-3">Our Offerings</span>
+                <h2 class="text-3xl md:text-5xl font-black text-[var(--text-main)] tracking-tight">Professional Supplies.</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 gap-y-12">
+                
+                <div class="flex flex-col h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2rem] overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="relative w-full h-64 overflow-hidden shrink-0">
+                        <img src="images/pexels-enginakyurt-10899526.jpg" alt="All-In-One Grow Bags" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/30 shadow-md">
+                            <i class="fas fa-star mr-1 text-amber-400"></i> Best Seller
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-1 bg-[var(--bg-card)] p-8 pt-10 -mt-8 rounded-t-[2rem] relative z-10">
+                        <div class="w-12 h-1 absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--border-color)] rounded-full"></div>
+                        <h3 class="text-2xl font-bold text-[var(--text-main)] mb-3 shrink-0">All-In-One Grow Bags</h3>
+                        <p class="text-[var(--text-muted)] text-sm leading-relaxed mb-8 flex-1">Complete, ready-to-inoculate substrate bags featuring a perfect mix of hydrated rye grain and CVG bulk substrate. Perfect for beginners seeking explosive flushes with zero mixing.</p>
+                        <a href="services-details.html" class="btn btn-outline w-full !py-3 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-colors flex items-center justify-center shrink-0">
+                            View Details <i class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2rem] overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="relative w-full h-64 overflow-hidden shrink-0">
+                        <img src="images/pexels-marek-piwnicki-3907296-17070350.jpg" alt="Gourmet Liquid Cultures" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="flex flex-col flex-1 bg-[var(--bg-card)] p-8 pt-10 -mt-8 rounded-t-[2rem] relative z-10">
+                        <div class="w-12 h-1 absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--border-color)] rounded-full"></div>
+                        <h3 class="text-2xl font-bold text-[var(--text-main)] mb-3 shrink-0">Gourmet Liquid Cultures</h3>
+                        <p class="text-[var(--text-muted)] text-sm leading-relaxed mb-8 flex-1">10cc syringes filled with vigorously growing, isolated live mycelium. Slash your colonization times in half compared to traditional spore inoculation. Includes 18-gauge sterile needle.</p>
+                        <a href="services-details.html" class="btn btn-outline w-full !py-3 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-colors flex items-center justify-center shrink-0">
+                            View Details <i class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2rem] overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="relative w-full h-64 overflow-hidden shrink-0">
+                        <img src="images/pexels-marek-piwnicki-3907296-17277440.jpg" alt="Sterilized Grain Spawn" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="flex flex-col flex-1 bg-[var(--bg-card)] p-8 pt-10 -mt-8 rounded-t-[2rem] relative z-10">
+                        <div class="w-12 h-1 absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--border-color)] rounded-full"></div>
+                        <h3 class="text-2xl font-bold text-[var(--text-main)] mb-3 shrink-0">Sterilized Grain Spawn</h3>
+                        <p class="text-[var(--text-muted)] text-sm leading-relaxed mb-8 flex-1">Premium organic rye berries hydrated to exact field capacity and pressure-sterilized at 15 PSI for over two hours. Features a heavy-duty 0.2 micron filter patch for safe gas exchange.</p>
+                        <a href="services-details.html" class="btn btn-outline w-full !py-3 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-colors flex items-center justify-center shrink-0">
+                            View Details <i class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2rem] overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="relative w-full h-64 overflow-hidden shrink-0">
+                        <img src="images/pexels-robert-schwarz-1488822070-28995757.jpg" alt="Premium Fruiting Blocks" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="flex flex-col flex-1 bg-[var(--bg-card)] p-8 pt-10 -mt-8 rounded-t-[2rem] relative z-10">
+                        <div class="w-12 h-1 absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--border-color)] rounded-full"></div>
+                        <h3 class="text-2xl font-bold text-[var(--text-main)] mb-3 shrink-0">Premium Fruiting Blocks</h3>
+                        <p class="text-[var(--text-muted)] text-sm leading-relaxed mb-8 flex-1">Hardwood and soy hull supplemented blocks, fully colonized and ready to burst. Just slice the bag open, mist daily, and watch a massive flush of mushrooms appear in days.</p>
+                        <a href="services-details.html" class="btn btn-outline w-full !py-3 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-colors flex items-center justify-center shrink-0">
+                            View Details <i class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2rem] overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="relative w-full h-64 overflow-hidden shrink-0">
+                        <img src="images/pexels-tony-lee-682301084-18086806.jpg" alt="Spore Syringes & Swabs" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="flex flex-col flex-1 bg-[var(--bg-card)] p-8 pt-10 -mt-8 rounded-t-[2rem] relative z-10">
+                        <div class="w-12 h-1 absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--border-color)] rounded-full"></div>
+                        <h3 class="text-2xl font-bold text-[var(--text-main)] mb-3 shrink-0">Spore Syringes & Swabs</h3>
+                        <p class="text-[var(--text-muted)] text-sm leading-relaxed mb-8 flex-1">Sourced from massive, healthy fruits in a sterile environment. Ideal for microscopic research or starting your own genetic isolations on agar from scratch.</p>
+                        <a href="services-details.html" class="btn btn-outline w-full !py-3 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-colors flex items-center justify-center shrink-0">
+                            View Details <i class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2rem] overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="relative w-full h-64 overflow-hidden shrink-0">
+                        <img src="images/pexels-vadym-alyekseyenko-137433856-10923305.jpg" alt="Lab & Cleanroom Gear" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="flex flex-col flex-1 bg-[var(--bg-card)] p-8 pt-10 -mt-8 rounded-t-[2rem] relative z-10">
+                        <div class="w-12 h-1 absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--border-color)] rounded-full"></div>
+                        <h3 class="text-2xl font-bold text-[var(--text-main)] mb-3 shrink-0">Lab & Cleanroom Gear</h3>
+                        <p class="text-[var(--text-muted)] text-sm leading-relaxed mb-8 flex-1">Equip your own at-home lab. We supply pre-poured MEA agar plates, disposable scalpels, parafilm, isopropyl alcohol, and personal protective equipment for serious cultivators.</p>
+                        <a href="services-details.html" class="btn btn-outline w-full !py-3 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-colors flex items-center justify-center shrink-0">
+                            View Details <i class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-10 pt-4">
+                <div class="lg:col-span-4">
+                    <a href="index.html" class="text-2xl font-black tracking-tighter block mb-6 flex items-center gap-2" style="color: var(--text-main); text-decoration: none;">
+                        MycoCraft
+                    </a>
+                    <p class="opacity-80 leading-relaxed text-sm mb-6 max-w-sm" style="color: var(--text-muted);">
+                        Equipping mycologists and hobbyists with premium grow kits, sterile supplies, and expert guidance for successful mushroom cultivation.
+                    </p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="social-link-circle"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link-circle"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link-circle"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                        <div>
+                            <h4>Grower Portal</h4>
+                            <ul class="space-y-3">
+                                <li><a href="login.html">Member Login</a></li>
+                                <li><a href="user.html">Dashboard</a></li>
+                                <li><a href="#">My Orders</a></li>
+                                <li><a href="pricing.html">Pricing Packages</a></li>
+                                <li><a href="faq.html">Growing FAQ</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Our Supplies</h4>
+                            <ul class="space-y-3">
+                                <li><a href="services.html">All-in-One Bags</a></li>
+                                <li><a href="services.html">Liquid Cultures</a></li>
+                                <li><a href="services.html">Grain Spawn</a></li>
+                                <li><a href="services.html">Fruiting Blocks</a></li>
+                                <li><a href="services.html">Lab Equipment</a></li>
+                            </ul>
+                        </div>
+                        <div class="sm:col-span-2 md:col-span-1">
+                            <h4>Mycology Support</h4>
+                            <ul class="space-y-3 text-[var(--text-muted)] text-sm">
+                                <li class="flex items-start gap-3"><i class="fas fa-map-marker-alt mt-1 shrink-0" style="color: var(--accent-color);"></i><span>124 Fungi Lane<br>Portland, OR 97204</span></li>
+                                <li class="flex items-center gap-3"><i class="fas fa-phone shrink-0" style="color: var(--accent-color);"></i><a href="tel:+1555019283" class="break-all">(555) 019-2834</a></li>
+                                <li class="flex items-center gap-3"><i class="fas fa-envelope shrink-0" style="color: var(--accent-color);"></i><a href="contact.html" class="break-all">spores@mycocraft.com</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom flex flex-col md:flex-row justify-between items-center text-sm gap-4">
+                <p style="color: var(--text-muted);">&copy; 2026 MycoCraft - Specialty Mushroom Supply. All rights reserved.</p>
+                <div class="flex flex-wrap justify-center gap-4 sm:gap-6">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Sterility Guarantee</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileBtn = document.getElementById('mobile-btn'); 
+        const fullscreenMenu = document.getElementById('fullscreen-menu'); 
+        const closeMenu = document.getElementById('close-menu'); 
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        
+        function toggleMenu() { 
+            fullscreenMenu.classList.toggle('active'); 
+            drawerOverlay.classList.toggle('active');
+            document.body.style.overflow = fullscreenMenu.classList.contains('active') ? 'hidden' : 'auto';
+        }
+        
+        mobileBtn.onclick = toggleMenu; 
+        closeMenu.onclick = toggleMenu; 
+        drawerOverlay.onclick = toggleMenu; 
+        
+        const themeDesktop = document.getElementById('theme-toggle-desktop');
+        const themeMobile = document.getElementById('theme-toggle-mobile'); 
+        const theme = localStorage.getItem('theme') || 'light';
+
+        function updateThemeUI(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode'); 
+                if(themeMobile) themeMobile.classList.add('active');
+            } else {
+                document.body.classList.remove('dark-mode');
+                if(themeMobile) themeMobile.classList.remove('active');
+            }
+        }
+        
+        updateThemeUI(theme === 'dark');
+        
+        function toggleTheme() { 
+            const isDark = !document.body.classList.contains('dark-mode');
+            updateThemeUI(isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light'); 
+        }
+        
+        themeDesktop.onclick = toggleTheme; 
+        if(themeMobile) themeMobile.onclick = toggleTheme;
+        
+        // RTL Logic
+        const rtlBtn = document.getElementById('rtl-btn'); 
+        const rtlMobile = document.getElementById('rtl-toggle-mobile'); 
+        const dir = localStorage.getItem('dir') || 'ltr';
+        
+        function updateRTLUI(currentDir) {
+            const isRTL = currentDir === 'rtl';
+            if (rtlBtn) rtlBtn.innerText = isRTL ? 'RTL' : 'LTR';
+            if (rtlMobile) rtlMobile.innerText = isRTL ? 'RTL' : 'LTR';
+        }
+
+        if (dir === 'rtl') { 
+            document.documentElement.dir = 'rtl'; 
+        }
+        updateRTLUI(dir);
+        
+        function toggleRTL() { 
+            const isRTL = document.documentElement.dir === 'rtl'; 
+            const newDir = isRTL ? 'ltr' : 'rtl';
+            document.documentElement.dir = newDir; 
+            localStorage.setItem('dir', newDir); 
+            updateRTLUI(newDir);
+        }
+        
+        if (rtlBtn) rtlBtn.onclick = toggleRTL; 
+        if (rtlMobile) rtlMobile.onclick = toggleRTL;
+    </script>
+</body>
+</html>
